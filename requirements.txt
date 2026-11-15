@@ -1,0 +1,5 @@
+# Sebelum submit, kunci versi persis yang Anda pakai:
+#     pip freeze > requirements.txt
+# lalu commit hasilnya. Aturan lomba menuntut file yang SAMA PERSIS saat direproduksi.
+numpy>=1.24
+pandas>=2.0

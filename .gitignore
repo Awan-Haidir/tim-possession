@@ -1,0 +1,26 @@
+# Data lomba tidak boleh dibagikan (termasuk ke repo publik)
+data/*
+!data/.gitkeep
+*.mp4
+*.pdf.bak
+
+# File submission = salinan jawaban; repo hanya perlu bisa membuatnya ulang
+outputs/*
+!outputs/.gitkeep
+evaluation/results/*.csv
+evaluation/reports/
+evaluation/scoreboard.csv
+
+# Ground truth privat tidak ada pada kita, tetapi jaga-jaga
+*_possession_gt.csv
+*_possession_gt_meta.json
+
+# Lingkungan dan cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
+.idea/
