@@ -47,6 +47,7 @@ def make_synthetic(folder):
 def test_pipeline_end_to_end():
     p = types.SimpleNamespace(**{k: v for k, v in vars(params).items() if k.isupper()})
     p.SWITCH_FRAMES = 25
+    p.USE_SMART_TAGGING = False
     with tempfile.TemporaryDirectory() as tmp:
         make_synthetic(tmp)
         codes = pipeline.run(tmp, p, n_frames=N, blocks=[(0, N - 1)], prekickoff_range=None)

@@ -25,13 +25,15 @@ def majority_vote(codes, window, home=0, away=1, nobody=-1):
     return out
 
 
-def hysteresis(team_codes, dead, switch_frames, nobody=-1):
+def hysteresis(team_codes, dead, switch_frames, nobody=-1, restart_hint=None):
     """Possession pindah hanya jika tim lain terus terdekat selama switch_frames frame.
 
     Dengan penanggalan mundur (back-dating): setelah pindah terkonfirmasi, titik pindah
     dimundurkan ke frame pertama bukti baru, jadi tidak terlambat (keterlambatan 1 detik
     merugikan spellF1 secara nyata). Bola mati mengosongkan pemegang; setelah restart,
     tim pertama yang teramati menjadi pemegang.
+    restart_hint (opsional): array tim per frame, bernilai tim hanya di frame restart. Di frame itu
+    pemegang langsung diatur ke tim pelaku restart (tim yang menendang atau melempar memegang bola).
     Mengembalikan array tim per frame (nobody pada frame mati atau belum diketahui).
     """
     n = len(team_codes)
@@ -41,6 +43,8 @@ def hysteresis(team_codes, dead, switch_frames, nobody=-1):
         if dead[i]:
             current, cand, cand_count = nobody, nobody, 0
             continue
+        if restart_hint is not None and restart_hint[i] != nobody:
+            current, cand, cand_count = restart_hint[i], nobody, 0
         t = team_codes[i]
         if current == nobody:
             if t != nobody:

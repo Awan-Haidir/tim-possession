@@ -35,6 +35,17 @@ def test_dead_ball_clears_and_restarts():
     assert labels[39] == 0 and labels[60] == 1       # setelah restart ikut tim pertama yang teramati
 
 
+def test_restart_hint_sets_holder_at_restart():
+    codes = np.full(100, -1, dtype=np.int8)           # tidak ada bukti sama sekali
+    dead = np.zeros(100, dtype=bool)
+    dead[:40] = True
+    hint = np.full(100, -1, dtype=np.int8)
+    hint[40] = 1
+    out = smooth.hysteresis(codes, dead, 30, restart_hint=hint)
+    assert (out[40:] == 1).all()                      # pemegang = tim pelaku restart
+    assert (out[:40] == -1).all()
+
+
 def test_merge_short_islands():
     labels = np.array([0] * 50 + [1] * 5 + [0] * 50, dtype=np.int8)
     out = smooth.merge_short_islands(labels, min_len=25)

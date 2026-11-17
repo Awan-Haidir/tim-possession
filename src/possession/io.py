@@ -25,12 +25,14 @@ def team_of_slot(meta_path, home=0, away=1):
     return np.array([home if tid == team_ids[0] else away for tid in slots], dtype=np.int8)
 
 
-def _xy(group):
+def _xys(group):
+    """(x, y, kecepatan m/s) dari satu grup "x,y,s"; NaN jika hilang."""
     group = group.strip()
     if not group or group[0] == "N":          # "NaN,NaN,NaN" atau kosong
-        return np.nan, np.nan
+        return np.nan, np.nan, np.nan
     parts = group.split(",")
-    return float(parts[0]), float(parts[1])
+    speed = float(parts[2]) if len(parts) > 2 else np.nan
+    return float(parts[0]), float(parts[1]), speed
 
 
 def load_tracking(raw_path, n_frames, n_slots):
@@ -39,9 +41,11 @@ def load_tracking(raw_path, n_frames, n_slots):
     Mengembalikan:
       ball    (n_frames, 2)          posisi bola ternormalisasi 0-1, NaN jika tidak terlihat
       players (n_frames, n_slots, 2) posisi pemain ternormalisasi 0-1, NaN jika slot kosong
+      player_speed (n_frames, n_slots) kecepatan tiap slot (m/s), NaN jika slot kosong
     """
     ball = np.full((n_frames, 2), np.nan)
     players = np.full((n_frames, n_slots, 2), np.nan)
+    player_speed = np.full((n_frames, n_slots), np.nan)
     with open(raw_path) as handle:
         for line in handle:
             parts = line.split(":")
@@ -50,12 +54,14 @@ def load_tracking(raw_path, n_frames, n_slots):
             frame = int(parts[0]) - 1
             if not 0 <= frame < n_frames:
                 continue
-            ball[frame] = _xy(parts[2])
+            ball[frame] = _xys(parts[2])[:2]
             for slot, group in enumerate(parts[1].split(";")):
                 if slot >= n_slots:
                     break
-                players[frame, slot] = _xy(group)
-    return ball, players
+                x, y, speed = _xys(group)
+                players[frame, slot] = (x, y)
+                player_speed[frame, slot] = speed
+    return ball, players, player_speed
 
 
 def load_smart_tagging(path, fps=25):
